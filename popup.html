@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Email Finder Extension</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 350px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+    
+    .container {
+      padding: 15px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .header h1 {
+      font-size: 18px;
+      margin: 0;
+      color: #333;
+    }
+    
+    .status-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .status-free {
+      background-color: #f0f0f0;
+      color: #666;
+    }
+    
+    .status-premium {
+      background-color: #ffd700;
+      color: #333;
+    }
+    
+    .subscription-info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    .button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 4px;
+      background-color: #4285f4;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+    }
+    
+    .button:hover {
+      background-color: #3367d6;
+    }
+    
+    .premium-button {
+      background-color: #ffd700;
+      color: #333;
+    }
+    
+    .premium-button:hover {
+      background-color: #ffcc00;
+    }
+    
+    .disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .disabled:hover {
+      background-color: #4285f4;
+    }
+    
+    .premium-button.disabled:hover {
+      background-color: #ffd700;
+    }
+    
+    #subscribe-button {
+      background-color: #0f9d58;
+    }
+    
+    #subscribe-button:hover {
+      background-color: #0b8043;
+    }
+    
+    .results {
+      margin-top: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 10px;
+    }
+    
+    .contacts-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .contact-item {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .contact-item strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    
+    .contact-item div {
+      font-size: 13px;
+      color: #666;
+      margin: 3px 0;
+    }
+    
+    .context-prefix {
+      font-style: italic;
+      color: #888;
+      font-size: 12px;
+      margin-top: 5px;
+      word-break: break-word;
+    }
+    
+    .footer {
+      font-size: 11px;
+      color: #999;
+      text-align: center;
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Email Finder</h1>
+      <div class="status-container">
+        <span id="subscription-status" class="status-badge status-free">Free</span>
+      </div>
+    </div>
+    
+    <button id="crawl-basic" class="button">Find Emails on Current Page</button>
+    <button id="crawl-premium" class="button premium-button disabled" disabled>Crawl Website for Emails (Premium)</button>
+    <button id="subscribe-button" class="button">Subscribe Now</button>
+    
+    <div id="results" class="results">
+      <p>Click one of the buttons above to find emails on the current page.</p>
+    </div>
+    
+    <div class="footer">
+      Email Finder Extension &copy; 2025
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
