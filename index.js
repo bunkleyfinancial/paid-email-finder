@@ -321,7 +321,7 @@ app.get('/payment.html', (req, res) => {
     <h1>Upgrade to Premium</h1>
     
     <div class="pricing">
-      <div class="price">$9.95</div>
+      <div class="price">$7.00</div>
       <div class="period">per month</div>
     </div>
     
@@ -399,7 +399,7 @@ app.get('/payment.html', (req, res) => {
                 body: JSON.stringify({
                   sourceId: tokenResult.token,
                   customerId: customerId,
-                  amount: 995 // in cents ($9.95/mo)
+                  amount: 995 // in cents ($7.00/mo)
                 })
               });
               
