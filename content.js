@@ -32,7 +32,7 @@ function findEmailsOnPage() {
 
 async function verifyPremiumAndFindEmails(token) {
   try {
-      const verifyResponse = await fetch('https://paid-email-finder-o7ey-ap12ovqkk-joshuas-projects-e1236601.vercel.app/verify-token', {
+      const verifyResponse = await fetch('https://paid-email-finder-o7ey-ap12ovqkk-joshuas-projects-e1236601.vercel.app/api/verify-token', {
           method: 'GET',
           headers: {
               'Authorization': `Bearer ${token}`
