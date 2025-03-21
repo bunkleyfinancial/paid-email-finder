@@ -399,7 +399,7 @@ app.get('/payment.html', (req, res) => {
                 body: JSON.stringify({
                   sourceId: tokenResult.token,
                   customerId: customerId,
-                  amount: 995 // in cents ($7.00/mo)
+                  amount: 700 // in cents ($7.00/mo)
                 })
               });
               
