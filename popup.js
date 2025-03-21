@@ -98,17 +98,25 @@ function disablePremiumFeatures() {
 }
 
 function openSubscribePage() {
-  chrome.storage.sync.get(['customerId'], function(data) {
-      let customerId = data.customerId;
-      
-      if (!customerId) {
-          customerId = 'cust_' + Math.random().toString(36).substring(2, 15);
-          chrome.storage.sync.set({ 'customerId': customerId });
-      }
-      
-      chrome.tabs.create({ url: `subscribe.html?customerId=${customerId}` });
-  });
+    chrome.storage.sync.get(['customerId'], function(data) {
+        let customerId = data.customerId;
+        
+        if (!customerId) {
+            customerId = 'cust_' + Math.random().toString(36).substring(2, 15);
+            chrome.storage.sync.set({ 'customerId': customerId });
+        }
+        
+        chrome.tabs.create({ 
+            url: chrome.runtime.getURL(`subscribe.html?customerId=${customerId}`)
+        });
+    });
 }
+
+chrome.runtime.onMessage.addListener(function(message) {
+    if (message.action === "subscription_updated") {
+        checkSubscriptionStatus();
+    }
+});
 
 function findEmailsBasic() {
   chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {

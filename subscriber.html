@@ -129,10 +129,10 @@
     <div class="features">
       <h3>Premium Features:</h3>
       <ul>
-        <li>Advanced contact finding technology</li>
-        <li>Find additional contact details (position, company, social profiles)</li>
-        <li>Unlimited contacts per crawl</li>
-        <li>Export contacts to CSV</li>
+        <li>Website crawling for more emails</li>
+        <li>Find emails with context information</li>
+        <li>Unlimited emails per scan</li>
+        <li>Export to spreadsheet format</li>
         <li>Priority customer support</li>
       </ul>
     </div>
@@ -149,18 +149,24 @@
       <p>You can now close this tab and return to the extension.</p>
     </div>
     
-    <a href="popup.html" class="back-link">Cancel and go back</a>
+    <a href="#" id="back-link" class="back-link">Cancel and go back</a>
   </div>
   
   <!-- Load Square Web Payments SDK -->
   <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
   <script>
+    // Extract customerID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const customerId = urlParams.get('customerId') || 'unknown_customer';
     
     // Square credentials - Replace with your actual credentials
     const appId = 'sandbox-sq0idb-UP19W5jJ8w5Mw0sB3xBpGw';
     const locationId = 'LEFGKYG0T0Y8V';
+    
+    document.getElementById('back-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.close();
+    });
     
     async function initializePaymentForm() {
       if (!window.Square) {
@@ -186,7 +192,7 @@
             
             if (tokenResult.status === 'OK') {
               // Send token to server for processing
-              const response = await fetch('https://paid-email-finder-o7ey-ap12ovqkk-joshuas-projects-e1236601.vercel.app/process-payment', {
+              const response = await fetch('https://paid-email-finder-o7ey-ap12ovqkk-joshuas-projects-e1236601.vercel.app/api/process-payment', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -194,7 +200,7 @@
                 body: JSON.stringify({
                   sourceId: tokenResult.token,
                   customerId: customerId,
-                  amount: 695 // in cents ($6.95/mo) Will need to make an annual payment option later
+                  amount: 700 // in cents ($7/mo) Will need to create an annual option later
                 })
               });
               
@@ -205,13 +211,19 @@
                 document.getElementById('payment-form').style.display = 'none';
                 document.getElementById('success-message').style.display = 'block';
                 
-                chrome.storage.sync.set({
-                  'subscriptionToken': result.token,
-                  'subscriptionStatus': true,
-                  'subscriptionExpiry': result.expiresAt
-                }, function() {
+                chrome.runtime.sendMessage({
+                  action: "subscription_complete",
+                  token: result.token,
+                  expiresAt: result.expiresAt
+                }, function(response) {
                   console.log('Subscription saved to storage');
                 });
+                
+                localStorage.setItem('emailFinderSubscription', JSON.stringify({
+                  token: result.token,
+                  status: true,
+                  expiresAt: result.expiresAt
+                }));
               } else {
                 document.getElementById('payment-status').textContent = 'Payment failed: ' + result.error;
                 document.getElementById('submit-button').disabled = false;
@@ -234,6 +246,13 @@
     
     document.addEventListener('DOMContentLoaded', function() {
       initializePaymentForm();
+      
+      // Check if extension is available
+      if (typeof chrome !== 'undefined' && chrome.runtime) {
+        console.log('Extension runtime detected');
+      } else {
+        console.log('Running in standalone mode');
+      }
     });
   </script>
 </body>
