@@ -34,7 +34,7 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self' https://sandbox.web.squarecdn.com https://web.squarecdn.com; object-src 'self'"
   },
   "web_accessible_resources": [
     {
