@@ -50,7 +50,7 @@ function checkPaymentPageForSubscription() {
     }
     
     // Find any payment pages that might be open
-    chrome.tabs.query({url: "https://paid-email-finder-o7ey-m7hqz4h8v-joshuas-projects-e1236601.vercel.app/api/payment.html*"}, function(tabs) {
+    chrome.tabs.query({url: "https://paid-email-finder-o7ey-mk0arccr9-joshuas-projects-e1236601.vercel.app/api/payment.html*"}, function(tabs) {
       if (tabs.length === 0) {
         // No payment pages open, keep the alarm running for a bit in case user is still navigating
         return;

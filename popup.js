@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // Open the payment page on Vercel instead of a local HTML file
           chrome.tabs.create({ 
-              url: `https://paid-email-finder-o7ey-m7hqz4h8v-joshuas-projects-e1236601.vercel.app/payment.html?customerId=${customerId}`
+              url: `https://paid-email-finder-o7ey-mk0arccr9-joshuas-projects-e1236601.vercel.app/payment.html?customerId=${customerId}`
           });
           
           // Inform background script to start checking for subscription
