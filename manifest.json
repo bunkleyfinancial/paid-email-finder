@@ -38,7 +38,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["images/*", "subscribe.html"],
+      "resources": ["images/*", "payment.html"],
       "matches": ["<all_urls>"]
     }
   ]
