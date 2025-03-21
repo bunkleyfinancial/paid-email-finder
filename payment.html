@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Subscribe to Premium</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      margin-top: 0;
+      color: #333;
+      text-align: center;
+    }
+    
+    .pricing {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+    }
+    
+    .price {
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .period {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .features {
+      margin: 20px 0;
+    }
+    
+    .features ul {
+      padding-left: 20px;
+    }
+    
+    .features li {
+      margin-bottom: 8px;
+    }
+    
+    #payment-form {
+      margin-top: 30px;
+    }
+    
+    #card-container {
+      min-height: 140px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      padding: 12px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1) inset;
+      background-color: #fff;
+    }
+    
+    #payment-status {
+      text-align: center;
+      margin: 10px 0;
+      font-weight: bold;
+      min-height: 20px;
+    }
+    
+    #submit-button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4285f4;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    #submit-button:hover {
+      background-color: #3367d6;
+    }
+    
+    #success-message {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background-color: #e6f4ea;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #4285f4;
+      text-decoration: none;
+    }
+    
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    
+    .button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 20px 0 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: #4285f4;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+    }
+    
+    .button:hover {
+      background-color: #3367d6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Upgrade to Premium</h1>
+    
+    <div class="pricing">
+      <div class="price">$9.95</div>
+      <div class="period">per month</div>
+    </div>
+    
+    <div class="features">
+      <h3>Premium Features:</h3>
+      <ul>
+        <li>Website crawling for more emails</li>
+        <li>Find emails with context information</li>
+        <li>Unlimited emails per scan</li>
+        <li>Export to spreadsheet format</li>
+        <li>Priority customer support</li>
+      </ul>
+    </div>
+    
+    <form id="payment-form">
+      <div id="card-container"></div>
+      <button id="submit-button" type="submit">Pay Now</button>
+      <div id="payment-status"></div>
+    </form>
+    
+    <div id="success-message">
+      <h2>Thank you for subscribing!</h2>
+      <p>Your premium access has been activated.</p>
+      <p>You can now close this tab and return to the extension.</p>
+    </div>
+    
+    <a href="#" id="back-link" class="back-link">Cancel and go back</a>
+  </div>
+  
+  <!-- Load Square Web Payments SDK -->
+  <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+  <script>
+    // Extract customerID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const customerId = urlParams.get('customerId') || 'unknown_customer';
+    
+    // Square credentials
+    const appId = 'sandbox-sq0idb-UP19W5jJ8w5Mw0sB3xBpGw';
+    const locationId = 'LEFGKYG0T0Y8V';
+    
+    document.getElementById('back-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.close();
+    });
+    
+    async function initializePaymentForm() {
+      if (!window.Square) {
+        throw new Error('Square.js failed to load');
+      }
+      
+      const payments = window.Square.payments(appId, locationId);
+      
+      try {
+        const card = await payments.card();
+        await card.attach('#card-container');
+        
+        const form = document.getElementById('payment-form');
+        
+        form.addEventListener('submit', async function(event) {
+          event.preventDefault();
+          
+          try {
+            document.getElementById('payment-status').textContent = 'Processing payment...';
+            document.getElementById('submit-button').disabled = true;
+            
+            const tokenResult = await card.tokenize();
+            
+            if (tokenResult.status === 'OK') {
+              // Send token to server for processing
+              const response = await fetch('/api/process-payment', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  sourceId: tokenResult.token,
+                  customerId: customerId,
+                  amount: 995 // in cents ($9.95/mo)
+                })
+              });
+              
+              const result = await response.json();
+              
+              if (result.success) {
+                document.getElementById('payment-status').textContent = 'Payment successful!';
+                document.getElementById('payment-form').style.display = 'none';
+                document.getElementById('success-message').style.display = 'block';
+                
+                // Store subscription info for the extension to find
+                localStorage.setItem('emailFinderSubscription', JSON.stringify({
+                  token: result.token,
+                  status: true,
+                  expiresAt: result.expiresAt,
+                  customerId: customerId
+                }));
+                
+                // Add a return button
+                const returnButton = document.createElement('button');
+                returnButton.textContent = 'Return to Extension';
+                returnButton.className = 'button';
+                returnButton.onclick = function() {
+                  window.close();
+                };
+                document.getElementById('success-message').appendChild(returnButton);
+              } else {
+                document.getElementById('payment-status').textContent = 'Payment failed: ' + (result.error || 'Unknown error');
+                document.getElementById('submit-button').disabled = false;
+              }
+            } else {
+              document.getElementById('payment-status').textContent = 'Payment failed: ' + tokenResult.errors[0].message;
+              document.getElementById('submit-button').disabled = false;
+            }
+          } catch (e) {
+            console.error('Payment error:', e);
+            document.getElementById('payment-status').textContent = 'Payment error: ' + e.message;
+            document.getElementById('submit-button').disabled = false;
+          }
+        });
+      } catch (e) {
+        console.error('Square initialization error:', e);
+        document.getElementById('payment-status').textContent = 'Could not initialize payment form: ' + e.message;
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      initializePaymentForm();
+    });
+  </script>
+</body>
+</html>
