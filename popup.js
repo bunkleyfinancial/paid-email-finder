@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (token && expiry && new Date(expiry) > new Date()) {
             try {
-                const response = await fetch('https://paid-email-finder-o7ey-g099za34b-joshuas-projects-e1236601.vercel.app/api/verify-token', {
+                const response = await fetch('https://paid-email-finder-o7ey-mk0arccr9-joshuas-projects-e1236601.vercel.app/api/verify-token', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
