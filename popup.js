@@ -24,7 +24,7 @@ function checkSubscriptionStatus() {
       if (token && expiry && new Date(expiry) > new Date()) {
           // Verify with the server
           try {
-              const response = await fetch('https://your-api.com/verify-token', {
+              const response = await fetch('https://paid-email-finder-o7ey-ap12ovqkk-joshuas-projects-e1236601.vercel.app/verify-token', {
                   method: 'GET',
                   headers: {
                       'Authorization': `Bearer ${token}`
