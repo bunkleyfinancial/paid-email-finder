@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Email Finder Pro",
+  "name": "Crawl Space Pro",
   "version": "7.5",
-  "description": "Find emails on web pages with free, and across entire website with premium features",
+  "description": "Find emails on the current web pages with free, and across entire website with premium features",
   "permissions": [
     "activeTab",
     "scripting",

@@ -13,7 +13,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Environment variables
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -21,18 +20,15 @@ const SQUARE_ACCESS_TOKEN = process.env.SQUARE_ACCESS_TOKEN;
 const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
 const SQUARE_ENVIRONMENT = process.env.NODE_ENV === 'production' ? Environment.Production : Environment.Sandbox;
 
-// Connect to MongoDB
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Configure Square client
 const squareClient = new Client({
   accessToken: SQUARE_ACCESS_TOKEN,
   environment: SQUARE_ENVIRONMENT
 });
 
-// Subscription Schema
 const SubscriptionSchema = new mongoose.Schema({
   customerId: { type: String, required: true, unique: true },
   status: { type: String, enum: ['active', 'expired', 'canceled'], default: 'active' },
@@ -47,7 +43,6 @@ const SubscriptionSchema = new mongoose.Schema({
 
 const Subscription = mongoose.model('Subscription', SubscriptionSchema);
 
-// JWT Authentication Middleware
 const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
   
@@ -62,14 +57,11 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-// Function to create or update a subscription
 async function createOrUpdateSubscription(customerId, paymentId, amount) {
-  // Calculate end date (30 days from now for monthly subscription)
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + 30);
   
   try {
-    // Find and update or create new subscription
     const subscription = await Subscription.findOneAndUpdate(
       { customerId },
       { 
@@ -79,7 +71,6 @@ async function createOrUpdateSubscription(customerId, paymentId, amount) {
       { upsert: true, new: true }
     );
     
-    // Add payment to history
     subscription.paymentHistory.push({
       paymentId,
       amount,
@@ -94,14 +85,10 @@ async function createOrUpdateSubscription(customerId, paymentId, amount) {
   }
 }
 
-// Generate JWT token
 function generateAuthToken(customerId) {
   return jwt.sign({ customerId }, JWT_SECRET, { expiresIn: '30d' });
 }
 
-// ROUTES
-
-// Process payment and create subscription
 app.post('/api/process-payment', async (req, res) => {
   const { sourceId, customerId, amount } = req.body;
   
@@ -113,7 +100,6 @@ app.post('/api/process-payment', async (req, res) => {
   }
   
   try {
-    // Create payment with Square API
     const paymentsApi = squareClient.paymentsApi;
     const response = await paymentsApi.createPayment({
       sourceId: sourceId,
@@ -127,17 +113,14 @@ app.post('/api/process-payment', async (req, res) => {
       note: 'Chrome Extension Subscription'
     });
     
-    // Payment was successful
     const paymentId = response.result.payment.id;
     
-    // Create or update subscription
     const subscription = await createOrUpdateSubscription(
       customerId, 
       paymentId, 
       parseInt(amount)
     );
     
-    // Generate token for client
     const token = generateAuthToken(customerId);
     
     res.status(200).json({
@@ -155,7 +138,6 @@ app.post('/api/process-payment', async (req, res) => {
   }
 });
 
-// Verify subscription
 app.get('/api/verify-subscription/:customerId', async (req, res) => {
   try {
     const { customerId } = req.params;
@@ -165,11 +147,9 @@ app.get('/api/verify-subscription/:customerId', async (req, res) => {
       return res.status(404).json({ subscribed: false });
     }
     
-    // Check if subscription is active and not expired
     const isActive = subscription.status === 'active' && 
                     new Date(subscription.endDate) > new Date();
     
-    // Generate a new token if active
     let token = null;
     if (isActive) {
       token = generateAuthToken(customerId);
@@ -185,7 +165,6 @@ app.get('/api/verify-subscription/:customerId', async (req, res) => {
   }
 });
 
-// Verify token validity
 app.get('/api/verify-token', authenticateToken, (req, res) => {
   res.status(200).json({ 
     valid: true,
@@ -193,15 +172,12 @@ app.get('/api/verify-token', authenticateToken, (req, res) => {
   });
 });
 
-// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK' });
 });
 
-// Start server if not in production (Vercel handles this automatically)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
-// Export for serverless functions
 module.exports = app;

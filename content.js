@@ -1,11 +1,8 @@
-// Listen for messages from the popup
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === "crawlBasic") {
-      // Basic email crawl (current page only)
       const emails = findEmailsOnPage();
       sendResponse({ contacts: emails });
   } else if (request.action === "crawlPremium") {
-      // Premium email crawl with token verification
       if (!request.token) {
           sendResponse({ error: "No authentication token provided" });
           return true;
@@ -18,12 +15,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
           .catch(error => {
               sendResponse({ error: error.message });
           });
-      return true; // Required for async sendResponse
+      return true;
   }
   return true;
 });
 
-// Find emails on the current page
 function findEmailsOnPage() {
   const bodyText = document.body.innerText;
   const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
@@ -34,11 +30,9 @@ function findEmailsOnPage() {
   return uniqueEmails;
 }
 
-// Verify premium status and find emails with context
 async function verifyPremiumAndFindEmails(token) {
   try {
-      // First verify the token is valid
-      const verifyResponse = await fetch('https://your-api.com/verify-token', {
+      const verifyResponse = await fetch('https://paid-email-finder-o7ey-ap12ovqkk-joshuas-projects-e1236601.vercel.app/verify-token', {
           method: 'GET',
           headers: {
               'Authorization': `Bearer ${token}`
@@ -51,7 +45,6 @@ async function verifyPremiumAndFindEmails(token) {
           throw new Error('Premium subscription required');
       }
       
-      // If valid, crawl for emails with context
       return findEmailsWithContext();
   } catch (error) {
       console.error('Token verification error:', error);
@@ -59,16 +52,13 @@ async function verifyPremiumAndFindEmails(token) {
   }
 }
 
-// Find emails with context for premium users
 function findEmailsWithContext() {
   const uniqueEmails = new Set();
   const emailsWithContext = [];
   
-  // Get the HTML and visible text of the page
   const html = document.documentElement.innerHTML;
   const bodyText = document.body.innerText;
   
-  // Extract emails with context
   const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
   let match;
   
@@ -81,12 +71,10 @@ function findEmailsWithContext() {
       
       uniqueEmails.add(email);
       
-      // Get context (text before the email)
       const emailIndex = bodyText.indexOf(email);
       let prefix = "";
       
       if (emailIndex !== -1) {
-          // Take up to 50 characters before the email
           prefix = bodyText.substring(Math.max(0, emailIndex - 50), emailIndex).trim();
       } else {
           prefix = "No visible context";

@@ -155,7 +155,6 @@
   <!-- Load Square Web Payments SDK -->
   <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
   <script>
-    // Get customerId from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const customerId = urlParams.get('customerId') || 'unknown_customer';
     
@@ -163,7 +162,6 @@
     const appId = 'sandbox-sq0idb-UP19W5jJ8w5Mw0sB3xBpGw';
     const locationId = 'LEFGKYG0T0Y8V';
     
-    // Create payment form
     async function initializePaymentForm() {
       if (!window.Square) {
         throw new Error('Square.js failed to load');
@@ -172,7 +170,6 @@
       const payments = window.Square.payments(appId, locationId);
       
       try {
-        // Initialize card payment method
         const card = await payments.card();
         await card.attach('#card-container');
         
@@ -182,11 +179,9 @@
           event.preventDefault();
           
           try {
-            // Show processing state
             document.getElementById('payment-status').textContent = 'Processing payment...';
             document.getElementById('submit-button').disabled = true;
             
-            // Get payment token from Square
             const tokenResult = await card.tokenize();
             
             if (tokenResult.status === 'OK') {
@@ -199,19 +194,17 @@
                 body: JSON.stringify({
                   sourceId: tokenResult.token,
                   customerId: customerId,
-                  amount: 995 // $9.95 in cents
+                  amount: 695 // in cents ($6.95/mo) Will need to make an annual payment option later
                 })
               });
               
               const result = await response.json();
               
               if (result.success) {
-                // Payment successful
                 document.getElementById('payment-status').textContent = 'Payment successful!';
                 document.getElementById('payment-form').style.display = 'none';
                 document.getElementById('success-message').style.display = 'block';
                 
-                // Store subscription data in Chrome storage
                 chrome.storage.sync.set({
                   'subscriptionToken': result.token,
                   'subscriptionStatus': true,
@@ -220,12 +213,10 @@
                   console.log('Subscription saved to storage');
                 });
               } else {
-                // Payment failed
                 document.getElementById('payment-status').textContent = 'Payment failed: ' + result.error;
                 document.getElementById('submit-button').disabled = false;
               }
             } else {
-              // Tokenization failed
               document.getElementById('payment-status').textContent = 'Payment failed: ' + tokenResult.errors[0].message;
               document.getElementById('submit-button').disabled = false;
             }
