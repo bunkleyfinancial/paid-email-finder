@@ -229,7 +229,6 @@
                 document.getElementById('payment-form').style.display = 'none';
                 document.getElementById('success-message').style.display = 'block';
                 
-                // Store subscription info for the extension to find
                 localStorage.setItem('emailFinderSubscription', JSON.stringify({
                   token: result.token,
                   status: true,
