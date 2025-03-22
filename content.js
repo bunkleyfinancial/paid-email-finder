@@ -32,7 +32,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   
   async function verifyPremiumAndFindEmails(token) {
     try {
-        const verifyResponse = await fetch(API_BASE_URL + '/api/verify-token', {
+        const verifyResponse = await fetch('https://paid-email-finder-o7ey.vercel.app/api/verify-token', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
