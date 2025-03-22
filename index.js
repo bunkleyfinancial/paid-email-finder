@@ -363,8 +363,8 @@ app.get('/payment.html', (req, res) => {
         <li>Find ALL emails across the website</li>
         <li>Find context like name & title (limited)</li>
         <li>Scan up to 50 pages in the Site Tree</li>
-        <li>Copy in spreadsheet format</li>
-        <li>Quickly Visualize your prospect</li>
+        <li>Copy in a spreadsheet format</li>
+        <li>Quickly Visualize your prospects</li>
       </ul>
     </div>
     
