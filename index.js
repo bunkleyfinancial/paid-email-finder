@@ -386,7 +386,7 @@ app.get('/payment.html', (req, res) => {
   </div>
   
   <!-- Load Square Web Payments SDK -->
-  <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+  <script src="https://web.squarecdn.com/v1/square.js"></script>
   <script>
     // Extract customerID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -394,8 +394,8 @@ app.get('/payment.html', (req, res) => {
     
     // Configuration variables
     // Note: In production, these values should be loaded from environment variables through a server endpoint
-    const appId = 'sandbox-sq0idb-UP19W5jJ8w5Mw0sB3xBpGw';
-    const locationId = 'LEFGKYG0T0Y8V';
+    const appId = 'sq0idp-lIyL_advCVL9hAxPjtrMYw';
+    const locationId = 'L83T5AER8G0H8';
     
     document.getElementById('back-link').addEventListener('click', function(e) {
       e.preventDefault();

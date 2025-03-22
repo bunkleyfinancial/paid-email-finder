@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function enablePremiumFeatures() {
     document.getElementById('subscription-status').textContent = 'Premium';
     document.getElementById('subscription-status').className = 'status-badge status-premium';
+    document.getElementById('extension-title').textContent = "Crawl Space Pro"
     
     const premiumButton = document.getElementById('crawl-premium');
     if (premiumButton) {
@@ -98,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function disablePremiumFeatures() {
     document.getElementById('subscription-status').textContent = 'Free';
     document.getElementById('subscription-status').className = 'status-badge status-free';
+    document.getElementById('extension-title').textContent = "Crawl Space limited"
     
     const premiumButton = document.getElementById('crawl-premium');
     if (premiumButton) {
