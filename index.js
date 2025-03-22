@@ -188,6 +188,10 @@ app.get('/api/health', (req, res) => {
 
 // Note: payment.html is now served as a static file from the public directory
 
+app.get('/payment.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'payment.html'));
+});
+
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
