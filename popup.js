@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function disablePremiumFeatures() {
     document.getElementById('subscription-status').textContent = 'Free';
     document.getElementById('subscription-status').className = 'status-badge status-free';
-    document.getElementById('extension-title').textContent = "Crawl Space limited"
+    document.getElementById('extension-title').textContent = "Crawl Space"
     
     const premiumButton = document.getElementById('crawl-premium');
     if (premiumButton) {

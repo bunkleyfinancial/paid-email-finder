@@ -452,7 +452,7 @@ app.get('/payment.html', (req, res) => {
                 document.getElementById('success-message').style.display = 'block';
                 
                 // Store subscription info for the extension to find
-                localStorage.setItem('emailFinderSubscription', JSON.stringify({
+                localStorage.setItem('crawlSpaceSubscription', JSON.stringify({
                   token: result.token,
                   status: true,
                   expiresAt: result.expiresAt,

@@ -64,7 +64,7 @@ function checkPaymentPageForSubscription() {
         function: function() {
           // Check if subscription data exists in localStorage
           try {
-            const subscriptionData = localStorage.getItem('emailFinderSubscription');
+            const subscriptionData = localStorage.getItem('crawlSpaceSubscription');
             if (subscriptionData) {
               const data = JSON.parse(subscriptionData);
               return data;
@@ -98,7 +98,7 @@ function checkPaymentPageForSubscription() {
           chrome.scripting.executeScript({
             target: {tabId: tabs[0].id},
             function: function() {
-              localStorage.removeItem('emailFinderSubscription');
+              localStorage.removeItem('crawlSpaceSubscription');
             }
           });
           
