@@ -12,6 +12,9 @@
   ],
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/payment.html",
       "dest": "/public/payment.html"
     },
