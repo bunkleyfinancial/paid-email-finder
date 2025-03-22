@@ -4,12 +4,28 @@
     {
       "src": "index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
+      "src": "/payment.html",
+      "dest": "/public/payment.html"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.ico"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/index.js"
+    },
+    {
       "src": "/(.*)",
-      "dest": "index.js"
+      "dest": "/index.js"
     }
   ]
 }

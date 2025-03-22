@@ -30,6 +30,8 @@ function startSubscriptionCheck(customerId) {
   
   // Store the customerId for later use
   chrome.storage.local.set({ 'pendingCustomerId': customerId });
+  
+  console.log('Started subscription check for customer ID:', customerId);
 }
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
@@ -61,10 +63,14 @@ function checkPaymentPageForSubscription() {
         target: {tabId: tabs[0].id},
         function: function() {
           // Check if subscription data exists in localStorage
-          const subscriptionData = localStorage.getItem('emailFinderSubscription');
-          if (subscriptionData) {
-            const data = JSON.parse(subscriptionData);
-            return data;
+          try {
+            const subscriptionData = localStorage.getItem('emailFinderSubscription');
+            if (subscriptionData) {
+              const data = JSON.parse(subscriptionData);
+              return data;
+            }
+          } catch (error) {
+            console.error('Error reading subscription data:', error);
           }
           return null;
         }
@@ -79,6 +85,8 @@ function checkPaymentPageForSubscription() {
             'subscriptionStatus': true,
             'subscriptionExpiry': data.expiresAt,
             'customerId': data.customerId
+          }, () => {
+            console.log('Subscription data stored successfully');
           });
           
           // Notify any open popup pages
@@ -114,7 +122,10 @@ function checkSubscriptionStatus() {
     const token = data.subscriptionToken;
     const customerId = data.customerId;
     
-    if (!token || !customerId) return;
+    if (!token || !customerId) {
+      console.log('No subscription token or customer ID found');
+      return;
+    }
     
     try {
       const response = await fetch('https://paid-email-finder-o7ey.vercel.app/api/verify-subscription/' + customerId, {
@@ -124,6 +135,10 @@ function checkSubscriptionStatus() {
         }
       });
       
+      if (!response.ok) {
+        throw new Error(`Subscription check failed with status: ${response.status}`);
+      }
+      
       const result = await response.json();
       
       if (result.subscribed) {
@@ -132,11 +147,15 @@ function checkSubscriptionStatus() {
           'subscriptionToken': result.token,
           'subscriptionStatus': true,
           'subscriptionExpiry': result.expiresAt
+        }, () => {
+          console.log('Subscription renewed successfully');
         });
       } else {
         // Subscription expired
         chrome.storage.sync.set({
           'subscriptionStatus': false
+        }, () => {
+          console.log('Subscription marked as expired');
         });
       }
     } catch (error) {
@@ -147,5 +166,6 @@ function checkSubscriptionStatus() {
 
 // Set up subscription check on extension start
 chrome.runtime.onInstalled.addListener(function() {
+  console.log('Extension installed/updated. Setting up subscription check.');
   chrome.alarms.create("checkSubscription", { periodInMinutes: 60 * 24 }); // Check daily
 });

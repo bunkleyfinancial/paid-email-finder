@@ -157,6 +157,48 @@
       padding-top: 10px;
       border-top: 1px solid #e0e0e0;
     }
+    
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+      display: none;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .progress-container {
+      margin-top: 10px;
+      display: none;
+    }
+    
+    .progress-bar {
+      height: 6px;
+      background-color: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+    
+    .progress-bar-inner {
+      height: 100%;
+      background-color: #4285f4;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
+    .progress-text {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -171,6 +213,15 @@
     <button id="crawl-basic" class="button">Find Emails on Current Page</button>
     <button id="crawl-premium" class="button premium-button disabled" disabled>Crawl Website for Emails (Premium)</button>
     <button id="subscribe-button" class="button">Subscribe Now</button>
+    
+    <div class="spinner" id="loading-spinner"></div>
+    
+    <div class="progress-container" id="progress-container">
+      <div class="progress-bar">
+        <div class="progress-bar-inner" id="progress-bar-inner"></div>
+      </div>
+      <div class="progress-text" id="progress-text">Processing page 0/0</div>
+    </div>
     
     <div id="results" class="results">
       <p>Click one of the buttons above to find emails on the current page.</p>
