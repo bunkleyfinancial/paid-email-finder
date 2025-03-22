@@ -360,11 +360,11 @@ app.get('/payment.html', (req, res) => {
     <div class="features">
       <h3>Premium Features:</h3>
       <ul>
-        <li>Website crawling for more emails</li>
-        <li>Find emails with context information</li>
-        <li>Unlimited emails per scan</li>
-        <li>Export to spreadsheet format</li>
-        <li>Priority customer support</li>
+        <li>Find ALL emails across the website</li>
+        <li>Find context like name & title (limited)</li>
+        <li>Scan up to 50 pages in the Site Tree</li>
+        <li>Copy in spreadsheet format</li>
+        <li>Quickly Visualize your prospect</li>
       </ul>
     </div>
     
