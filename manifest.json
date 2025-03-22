@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Crawl Space Pro",
-  "version": "7.5",
+  "version": "1.0",
   "description": "Find emails on the current web pages with free, and across entire website with premium features",
   "permissions": [
     "activeTab",
@@ -22,7 +22,8 @@
     }
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "icons": {
     "16": "icon16.png",
@@ -31,7 +32,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["constants.js", "content.js"]
     }
   ],
   "content_security_policy": {
@@ -39,7 +40,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["images/*"],
+      "resources": ["constants.js", "images/*"],
       "matches": ["<all_urls>"]
     }
   ]
