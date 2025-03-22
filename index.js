@@ -100,9 +100,20 @@ function generateAuthToken(customerId) {
 }
 
 app.post('/api/process-payment', async (req, res) => {
+  // Add timeout handling for the payment process
+  const timeoutDuration = 25000; // 25 seconds
+  const timeoutId = setTimeout(() => {
+    console.log('Payment request timed out after', timeoutDuration, 'ms');
+    return res.status(504).json({
+      success: false,
+      error: 'Request timed out - the payment service took too long to respond'
+    });
+  }, timeoutDuration);
+
   const { sourceId, customerId, amount } = req.body;
   
   if (!sourceId || !customerId || !amount) {
+    clearTimeout(timeoutId); // Clear timeout on early return
     return res.status(400).json({ 
       success: false, 
       error: 'Missing required parameters' 
@@ -133,6 +144,7 @@ app.post('/api/process-payment', async (req, res) => {
     
     const token = generateAuthToken(customerId);
     
+    clearTimeout(timeoutId); // Clear timeout on success
     res.status(200).json({
       success: true,
       paymentId: paymentId,
@@ -140,6 +152,7 @@ app.post('/api/process-payment', async (req, res) => {
       expiresAt: subscription.endDate
     });
   } catch (error) {
+    clearTimeout(timeoutId); // Clear timeout on error
     console.error('Payment error:', error);
     res.status(500).json({
       success: false,
