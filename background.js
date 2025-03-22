@@ -50,7 +50,7 @@ function checkPaymentPageForSubscription() {
     }
     
     // Find any payment pages that might be open
-    chrome.tabs.query({url: "https://paid-email-finder-o7ey-i2ar6e68-joshuas-projects-e1236601.vercel.app/payment.html*"}, function(tabs) {
+    chrome.tabs.query({url: "https://paid-email-finder-o7ey-i2arq6e68-joshuas-projects-e1236601.vercel.app/payment.html*"}, function(tabs) {
       if (tabs.length === 0) {
         // No payment pages open, keep the alarm running for a bit in case user is still navigating
         return;
@@ -117,7 +117,7 @@ function checkSubscriptionStatus() {
     if (!token || !customerId) return;
     
     try {
-      const response = await fetch('https://paid-email-finder-o7ey-i2ar6e68-joshuas-projects-e1236601.vercel.app/api/verify-subscription/' + customerId, {
+      const response = await fetch('https://paid-email-finder-o7ey-i2arq6e68-joshuas-projects-e1236601.vercel.app/api/verify-subscription/' + customerId, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
