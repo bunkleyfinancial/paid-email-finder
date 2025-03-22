@@ -350,7 +350,7 @@ app.get('/payment.html', (req, res) => {
 </head>
 <body>
   <div class="container">
-    <h1>Upgrade to Premium</h1>
+    <h1>Access Premium Features</h1>
     
     <div class="pricing">
       <div class="price">$7.00</div>
