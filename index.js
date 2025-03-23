@@ -382,7 +382,7 @@ app.get('/payment.html', (req, res) => {
       <p>You can now close this tab and return to the extension.</p>
     </div>
     
-    <a href="#" id="back-link" class="back-link">Cancel and go back</a>
+    <a href="#" id="back-link" class="back-link">Cancel and keep wasting more time</a>
   </div>
   
   <!-- Load Square Web Payments SDK -->
