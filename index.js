@@ -382,51 +382,58 @@ app.get('/payment.html', (req, res) => {
       <p>You can now close this tab and return to the extension.</p>
     </div>
     
-    <a href="#" id="back-link" class="back-link">Cancel and keep wasting more time</a>
+    <a href="#" id="back-link" class="back-link">Cancel and go back</a>
   </div>
   
   <!-- Load Square Web Payments SDK -->
   <script src="https://web.squarecdn.com/v1/square.js"></script>
   <script>
-    // Extract customerID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const customerId = urlParams.get('customerId') || 'unknown_customer';
+  // Extract customerID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const customerId = urlParams.get('customerId') || 'unknown_customer';
+  
+  // Configuration variables
+  // Note: In production, these values should be loaded from environment variables through a server endpoint
+  const appId = 'sq0idp-lIyL_advCVL9hAxPjtrMYw';
+  const locationId = 'L83T5AER8G0H8';
+  
+  document.getElementById('back-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    window.close();
+  });
+  
+  async function initializePaymentForm() {
+    if (!window.Square) {
+      showError('Square.js failed to load. Please refresh the page and try again.');
+      return;
+    }
     
-    // Configuration variables
-    // Note: In production, these values should be loaded from environment variables through a server endpoint
-    const appId = 'sq0idp-lIyL_advCVL9hAxPjtrMYw';
-    const locationId = 'L83T5AER8G0H8';
+    const payments = window.Square.payments(appId, locationId);
     
-    document.getElementById('back-link').addEventListener('click', function(e) {
-      e.preventDefault();
-      window.close();
-    });
-    
-    async function initializePaymentForm() {
-      if (!window.Square) {
-        showError('Square.js failed to load. Please refresh the page and try again.');
-        return;
-      }
+    try {
+      const card = await payments.card();
+      await card.attach('#card-container');
       
-      const payments = window.Square.payments(appId, locationId);
+      const form = document.getElementById('payment-form');
       
-      try {
-        const card = await payments.card();
-        await card.attach('#card-container');
+      form.addEventListener('submit', async function(event) {
+        event.preventDefault();
         
-        const form = document.getElementById('payment-form');
-        
-        form.addEventListener('submit', async function(event) {
-          event.preventDefault();
+        try {
+          document.getElementById('payment-status').textContent = 'Processing payment...';
+          document.getElementById('submit-button').disabled = true;
+          hideError();
           
-          try {
-            document.getElementById('payment-status').textContent = 'Processing payment...';
-            document.getElementById('submit-button').disabled = true;
-            hideError();
+          const tokenResult = await card.tokenize();
+          
+          if (tokenResult.status === 'OK') {
+            // Set a client-side timeout for the payment request
+            const paymentTimeout = setTimeout(() => {
+              document.getElementById('payment-status').textContent = 'Payment is still processing...';
+              showError('The payment is taking longer than expected. If this continues, your card may still be charged. Please wait or check your email for confirmation before trying again.');
+            }, 10000); // Show message after 10 seconds
             
-            const tokenResult = await card.tokenize();
-            
-            if (tokenResult.status === 'OK') {
+            try {
               // Send token to server for processing
               const response = await fetch('/api/process-payment', {
                 method: 'POST',
@@ -440,8 +447,16 @@ app.get('/payment.html', (req, res) => {
                 })
               });
               
+              clearTimeout(paymentTimeout);
+              
               if (!response.ok) {
-                throw new Error(\`Payment processing failed with status: \${response.status}\`);
+                if (response.status === 504) {
+                  // Special message for timeout errors
+                  showVerificationMessage();
+                  return;
+                } else {
+                  throw new Error(\`Payment processing failed with status: \${response.status}\`);
+                }
               }
               
               const result = await response.json();
@@ -471,38 +486,107 @@ app.get('/payment.html', (req, res) => {
                 showError(result.error || 'Unknown payment error');
                 document.getElementById('submit-button').disabled = false;
               }
-            } else {
-              showError(tokenResult.errors[0].message || 'Card tokenization failed');
+            } catch (e) {
+              clearTimeout(paymentTimeout);
+              console.error('Payment communication error:', e);
+              showError(e.message || 'Payment processing error');
               document.getElementById('submit-button').disabled = false;
             }
-          } catch (e) {
-            console.error('Payment error:', e);
-            showError(e.message || 'Payment processing error');
+          } else {
+            showError(tokenResult.errors[0].message || 'Card tokenization failed');
             document.getElementById('submit-button').disabled = false;
           }
-        });
-      } catch (e) {
-        console.error('Square initialization error:', e);
-        showError('Could not initialize payment form: ' + e.message);
-      }
+        } catch (e) {
+          console.error('Payment form error:', e);
+          showError(e.message || 'Payment processing error');
+          document.getElementById('submit-button').disabled = false;
+        }
+      });
+    } catch (e) {
+      console.error('Square initialization error:', e);
+      showError('Could not initialize payment form: ' + e.message);
     }
+  }
+  
+  // Function to show verification message if payment times out
+  function showVerificationMessage() {
+    document.getElementById('payment-form').style.display = 'none';
     
-    function showError(message) {
-      const errorElement = document.getElementById('error-message');
-      errorElement.textContent = message;
-      errorElement.style.display = 'block';
+    const verificationDiv = document.createElement('div');
+    verificationDiv.style.padding = '20px';
+    verificationDiv.style.backgroundColor = '#fff3cd';
+    verificationDiv.style.borderRadius = '4px';
+    verificationDiv.style.marginTop = '20px';
+    verificationDiv.style.textAlign = 'center';
+    
+    verificationDiv.innerHTML = \`
+      <h2>Payment Processing</h2>
+      <p>The payment request timed out, but your card may have been charged.</p>
+      <p>Please check your email for a payment confirmation from Square.</p>
+      <p>If your payment was successful, please click the button below to complete your subscription:</p>
+    \`;
+    
+    const verifyButton = document.createElement('button');
+    verifyButton.textContent = 'I received confirmation, activate my subscription';
+    verifyButton.className = 'button';
+    verifyButton.style.backgroundColor = '#28a745';
+    verifyButton.onclick = function() {
+      // Create a token without payment since payment was already processed
+      const token = createTemporaryToken();
+      
+      // Store subscription info for the extension to find
+      localStorage.setItem('crawlSpaceSubscription', JSON.stringify({
+        token: token,
+        status: true,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        customerId: customerId
+      }));
+      
+      document.getElementById('success-message').style.display = 'block';
+      verificationDiv.style.display = 'none';
+    };
+    
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'I was not charged, let me try again';
+    cancelButton.className = 'button';
+    cancelButton.style.marginTop = '10px';
+    cancelButton.style.backgroundColor = '#dc3545';
+    cancelButton.onclick = function() {
+      verificationDiv.remove();
+      document.getElementById('payment-form').style.display = 'block';
+      document.getElementById('submit-button').disabled = false;
       document.getElementById('payment-status').textContent = '';
-    }
+    };
     
-    function hideError() {
-      const errorElement = document.getElementById('error-message');
-      errorElement.textContent = '';
-      errorElement.style.display = 'none';
-    }
+    verificationDiv.appendChild(verifyButton);
+    verificationDiv.appendChild(cancelButton);
     
-    document.addEventListener('DOMContentLoaded', function() {
-      initializePaymentForm();
-    });
+    const container = document.querySelector('.container');
+    container.appendChild(verificationDiv);
+  }
+  
+  // Temporary token generator
+  function createTemporaryToken() {
+    // This will be replaced with a proper verification on the next background check
+    return 'temp_' + Math.random().toString(36).substring(2, 15);
+  }
+  
+  function showError(message) {
+    const errorElement = document.getElementById('error-message');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    document.getElementById('payment-status').textContent = '';
+  }
+  
+  function hideError() {
+    const errorElement = document.getElementById('error-message');
+    errorElement.textContent = '';
+    errorElement.style.display = 'none';
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    initializePaymentForm();
+  });
   </script>
 </body>
 </html>`);
