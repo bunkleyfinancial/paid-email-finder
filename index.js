@@ -27,7 +27,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 const SQUARE_ACCESS_TOKEN = process.env.SQUARE_ACCESS_TOKEN;
 const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
-const SQUARE_ENVIRONMENT = process.env.NODE_ENV === 'production' ? Environment.Production : Environment.Production;
+const SQUARE_ENVIRONMENT = Environment.Production;
 
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
