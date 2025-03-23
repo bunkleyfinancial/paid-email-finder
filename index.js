@@ -29,9 +29,32 @@ const SQUARE_ACCESS_TOKEN = process.env.SQUARE_ACCESS_TOKEN;
 const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
 const SQUARE_ENVIRONMENT = Environment.Production;
 
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// Improved MongoDB connection with retry logic
+const connectToDatabase = async (retries = 5, interval = 5000) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await mongoose.connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
+        socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+        maxPoolSize: 10 // Maintain up to 10 socket connections
+      });
+      console.log('Connected to MongoDB');
+      return;
+    } catch (err) {
+      console.error(`MongoDB connection attempt ${attempt} failed:`, err.message);
+      if (attempt === retries) {
+        console.error('All connection attempts failed. Operating in reduced functionality mode.');
+        throw err;
+      }
+      // Wait before next attempt
+      await new Promise(resolve => setTimeout(resolve, interval));
+    }
+  }
+};
+
+// Call this function instead of directly connecting
+connectToDatabase()
+  .catch(err => console.error('Fatal MongoDB connection error:', err));
 
 const squareClient = new Client({
   accessToken: SQUARE_ACCESS_TOKEN,
