@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Open the payment page on Vercel
       chrome.tabs.create({ 
-        url: `${API_BASE_URL}/payment.html?customerId=${customerId}&nocache=${Date.now()}`
+        url: `${API_BASE_URL}/payment.html?customerId=${customerId}`
       });
       
       // Inform background script to start checking for subscription
